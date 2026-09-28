@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pencarian Lokasi Detail</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .user-info {
+            border-bottom: 2px dashed #e2e8f0;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-info h3 {
+            font-size: 0.95rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-info h3 span {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        /* Styling Form Pencarian */
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-control:focus {
+            border-color: #3b82f6;
+        }
+
+        .btn-search {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-search:hover {
+            background-color: #2563eb;
+        }
+
+        /* Display Hasil Lokasi */
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .info-group {
+            background-color: #f8fafc;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .info-group label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-group p {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1e293b;
+            word-break: break-word;
+        }
+
+        .coordinates-group {
+            border-left-color: #10b981;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: -0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="user-info">
+            <h3>Nama : <span>firmansyah</span></h3>
+            <h3>NIM : <span>20240240013</span></h3>
+        </div>
+
+        <!-- Form Pencarian Kota & Negara -->
+        <div class="search-box">
+            <select id="inputNegara" class="input-control">
+                <option value="">-- Semua Negara --</option>
+                <option value="id" selected>Indonesia (ID)</option>
+                <option value="us">Amerika Serikat (US)</option>
+                <option value="jp">Jepang (JP)</option>
+                <option value="my">Malaysia (MY)</option>
+                <option value="sg">Singapura (SG)</option>
+                <option value="gb">Inggris / UK (GB)</option>
+            </select>
+            
+            <div class="search-row">
+                <input type="text" id="inputKota" class="input-control" placeholder="Masukkan nama kota/lokasi..." value="Jakarta">
+                <button id="btnCari" class="btn-search">Cari</button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message">Lokasi tidak ditemukan. Coba kata kunci lain.</div>
+
+        <!-- Output Informasi Lokasi -->
+        <div class="location-grid">
+            <div class="info-group">
+                <label>Kecamatan / Area</label>
+                <p id="kecamatan">-</p>
+            </div>
+
+            <div class="info-group">
+                <label>Kota / Kabupaten</label>
+                <p id="lokasi">-</p>
+            </div>
+
+            <div class="info-group">
+                <label>Provinsi</label>
+                <p id="provinsi">-</p>
+            </div>
+
+            <div class="info-group">
+                <label>Negara</label>
+                <p id="negara">-</p>
+            </div>
+
+            <div class="info-group coordinates-group">
+                <label>Longitude (Bujur)</label>
+                <p id="longitude">-</p>
+            </div>
+
+            <div class="info-group coordinates-group">
+                <label>Latitude (Lintang)</label>
+                <p id="latitude">-</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        const apiKey = "OPtSSe7KN7yV44mARFrz";
+
+        function cariLokasi() {
+            const queryKota = $("#inputKota").val().trim();
+            const kodeNegara = $("#inputNegara").val();
+
+            if (!queryKota) {
+                alert("Silakan masukkan nama kota terlebih dahulu.");
+                return;
+            }
+
+            // Parameter `country` digunakan jika negara dipilih
+            let urlapi = `https://api.maptiler.com/geocoding/${encodeURIComponent(queryKota)}.json?key=${apiKey}`;
+            if (kodeNegara) {
+                urlapi += `&country=${kodeNegara}`;
+            }
+
+            $.ajax({
+                url: urlapi,
+                method: "GET",
+                success: function(data) {
+                    console.log("Data API:", data);
+
+                    if (data.features && data.features.length > 0) {
+                        $("#errorMessage").hide();
+                        
+                        const feature = data.features[0];
+                        const context = feature.context || [];
+
+                        // 1. Koordinat [Longitude, Latitude]
+                        const [lon, lat] = feature.center;
+
+                        // 2. Ekstraksi Informasi Lokasi
+                        let kecamatan = context.find(c => c.id.startsWith("subdistrict") || c.id.startsWith("neighborhood") || c.id.startsWith("locality"))?.text || feature.text || "-";
+                        let lokasiKota = feature.matching_text || feature.text || "-";
+                        let provinsi = context.find(c => c.id.startsWith("region") || c.id.startsWith("province"))?.text || "-";
+                        let negara = context.find(c => c.id.startsWith("country"))?.text || "-";
+
+                        // 3. Tampilkan ke HTML
+                        $("#kecamatan").text(kecamatan);
+                        $("#lokasi").text(lokasiKota);
+                        $("#provinsi").text(provinsi);
+                        $("#negara").text(negara);
+                        $("#longitude").text(lon);
+                        $("#latitude").text(lat);
+                    } else {
+                        $("#errorMessage").show();
+                    }
+                },
+                error: function(error) {
+                    console.log("Error Fetching Data:", error);
+                    $("#errorMessage").text("Gagal mengambil data dari server.").show();
+                }
+            });
+        }
+
+        // Jalankan pencarian saat pertama kali dimuat
+        $(document).ready(function() {
+            cariLokasi();
+
+            // Event listener saat tombol cari diklik
+            $("#btnCari").click(function() {
+                cariLokasi();
+            });
+
+            // Event listener tekan 'Enter' di input text
+            $("#inputKota").keypress(function(e) {
+                if (e.which === 13) {
+                    cariLokasi();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
